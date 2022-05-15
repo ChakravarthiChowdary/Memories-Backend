@@ -195,3 +195,29 @@ export const getLikedOrFavPostsOfUser: RequestHandler = async (
     next(error);
   }
 };
+
+export const getMyPosts: RequestHandler = async (req, res, next) => {
+  try {
+    const userId = req.params.id;
+
+    if (!userId) {
+      return next(
+        new HttpError("Please provide user id as param to fetch posts.", 400)
+      );
+    }
+
+    const user = await User.findOne({ _id: userId }).exec();
+
+    if (!user) {
+      return next(new HttpError("Something wrong with authentication.", 403));
+    }
+
+    const posts = await Post.find({ userId: userId })
+      .select(["-likedUsers", "-favUsers"])
+      .exec();
+
+    res.status(200).json(posts);
+  } catch (error) {
+    next(error);
+  }
+};

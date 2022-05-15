@@ -6,6 +6,7 @@ import {
   getAllMemories,
   getLikedOrFavPostsOfUser,
   getMemory,
+  getMyPosts,
   postMemory,
 } from "../controllers/posts";
 import checkAuth from "../middlewares/authCheck";
@@ -25,7 +26,9 @@ router.post(
       .withMessage("Title cannot be blank for a post."),
     check("description")
       .isLength({ min: 8 })
-      .withMessage("Description cannot be blank for a post."),
+      .withMessage(
+        "Description should have min length of 8 characters for a post."
+      ),
     check("photoUrls")
       .not()
       .isEmpty()
@@ -55,5 +58,7 @@ router.get(
   "/getLikedOrFavPostsOfUser/:likedOrFav/:id",
   getLikedOrFavPostsOfUser
 );
+
+router.get("/getMyPosts/:id", getMyPosts);
 
 export default router;
