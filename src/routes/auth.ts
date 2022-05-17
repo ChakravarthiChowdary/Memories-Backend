@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { check } from "express-validator";
-import { signInUser, signUpUser } from "../controllers/auth";
+import { signInUser, signUpUser, updateProfile } from "../controllers/auth";
 
 const router = Router();
 
@@ -33,6 +33,18 @@ router.post(
       .withMessage("Password must not be left blank."),
   ],
   signInUser
+);
+
+router.patch(
+  "/updateProfile",
+  [
+    check("username").not().isEmpty().withMessage("Username must not be blank"),
+    check("passwordUpdated")
+      .not()
+      .isEmpty()
+      .withMessage("Password updated filed must not be blank"),
+  ],
+  updateProfile
 );
 
 export default router;

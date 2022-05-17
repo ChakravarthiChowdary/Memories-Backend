@@ -101,3 +101,67 @@ export const signInUser: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
+
+export const updateProfile: RequestHandler = async (req, res, next) => {
+  try {
+    console.log(req.body);
+    const userId = req.body.id;
+    const username = req.body.username;
+    const passwordUpdated = req.body.passwordUpdated;
+    const password = req.body.password;
+    const confirmPassword = req.body.confirmPassword;
+
+    if (!userId) {
+      return next(new HttpError("User Id should be sent as part of body", 400));
+    }
+
+    if (!username && !passwordUpdated) {
+      return next(new HttpError("Should change something", 400));
+    }
+
+    const user = await User.findOne({ _id: userId }).exec();
+
+    if (!user) {
+      return next(new HttpError("Something wrong with authentication", 403));
+    }
+
+    let hashedPassword;
+
+    if (passwordUpdated) {
+      if (!password || !confirmPassword) {
+        return next(
+          new HttpError(
+            "Please provide password and confirm password to update.",
+            400
+          )
+        );
+      }
+
+      if (password !== confirmPassword) {
+        return next(
+          new HttpError("Confirm password and password should be same.", 400)
+        );
+      }
+
+      if (password.length < 8) {
+        return next(
+          new HttpError("Password should have min length of 8 characters.", 400)
+        );
+      }
+
+      hashedPassword = await bcryptjs.hash(password, 12);
+    }
+
+    await User.findByIdAndUpdate(userId, {
+      email: user.email,
+      username,
+      password: hashedPassword ? hashedPassword : user.password,
+      photoUrl: user.photoUrl,
+    });
+    res.status(200).json({
+      success: true,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

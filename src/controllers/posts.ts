@@ -3,6 +3,7 @@ import { validationResult } from "express-validator";
 import HttpError from "../models/HttpError";
 import Post from "../schema/Post";
 import User from "../schema/User";
+import bcryptjs from "bcryptjs";
 
 export const postMemory: RequestHandler = async (req, res, next) => {
   try {
