@@ -87,6 +87,10 @@ export const signInUser: RequestHandler = async (req, res, next) => {
       { expiresIn: "1h" }
     );
 
+    const expiresIn = new Date();
+
+    expiresIn.setTime(expiresIn.getTime() + 60 * 60 * 1000);
+
     res.status(200).json({
       userInfo: {
         username: userExists.toObject().username,
@@ -94,6 +98,7 @@ export const signInUser: RequestHandler = async (req, res, next) => {
         email: userExists.toObject().email,
         photoUrl: userExists.toObject().photoUrl,
         token,
+        expiresIn,
       },
       status: "Success",
     });
