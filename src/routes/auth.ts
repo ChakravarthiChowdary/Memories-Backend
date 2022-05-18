@@ -1,6 +1,11 @@
 import { Router } from "express";
 import { check } from "express-validator";
-import { signInUser, signUpUser, updateProfile } from "../controllers/auth";
+import {
+  forgotPassword,
+  signInUser,
+  signUpUser,
+  updateProfile,
+} from "../controllers/auth";
 
 const router = Router();
 
@@ -45,6 +50,26 @@ router.patch(
       .withMessage("Password updated filed must not be blank"),
   ],
   updateProfile
+);
+
+router.patch(
+  "/forgotpassword",
+  [
+    check("email").isEmail().withMessage("Email is not valid."),
+    check("oldPassword")
+      .not()
+      .isEmpty()
+      .withMessage("Old password not provided."),
+    check("newPassword")
+      .not()
+      .isEmpty()
+      .withMessage("New password not provided."),
+    check("confirmPassword")
+      .not()
+      .isEmpty()
+      .withMessage("Confirm password not provided."),
+  ],
+  forgotPassword
 );
 
 export default router;

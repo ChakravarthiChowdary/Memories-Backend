@@ -170,3 +170,54 @@ export const updateProfile: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
+
+export const forgotPassword: RequestHandler = async (req, res, next) => {
+  try {
+    const { email, oldPassword, confirmPassword, newPassword } = req.body;
+
+    if (newPassword.length < 8) {
+      return next(
+        new HttpError("New password should be have min of 8 characters.", 403)
+      );
+    }
+
+    if (oldPassword === newPassword) {
+      return next(
+        new HttpError(
+          "New password should be different from old password.",
+          403
+        )
+      );
+    }
+
+    const user = await User.findOne({ email: email }).exec();
+
+    if (!user) {
+      return next(new HttpError("Email or old password is wrong.", 403));
+    }
+
+    if (newPassword !== confirmPassword) {
+      return next(
+        new HttpError("New password and confirm passwords does'nt match.", 403)
+      );
+    }
+
+    const isValidPassword = await bcryptjs.compare(oldPassword, user.password);
+
+    if (!isValidPassword) {
+      return next(new HttpError("Email or old password is wrong.", 403));
+    }
+
+    const hashedPassword = await bcryptjs.hash(newPassword, 12);
+
+    await User.findByIdAndUpdate(user._id, {
+      password: hashedPassword,
+    });
+
+    res.status(200).json({
+      success: true,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
