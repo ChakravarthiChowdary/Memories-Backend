@@ -15,6 +15,10 @@ export const signUpUser: RequestHandler = async (req, res, next) => {
 
     const { username, email, password, confirmPassword, photoUrl } = req.body;
 
+    if (password.length < 8) {
+      return next(new HttpError("Password should have min of 8 characters."));
+    }
+
     if (password !== confirmPassword) {
       return next(new HttpError("Passwords does not match. Try again."));
     }
